@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}GreenBank{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --g1:#0f7a3a;
+  --g2:#22c55e;
+}
+
+/* ===== BODY ===== */
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75)),
+    url("https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=1920&q=80");
+  background-size:cover;
+  background-position:center;
+  color:#fff;
+}
+
+/* ===== NAVBAR (STABLE) ===== */
+.nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:60px;
+  padding:0 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:linear-gradient(90deg,var(--g1),var(--g2));
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+  z-index:10;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#fff;
+}
+
+.logo{
+  width:34px;height:34px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--g1),var(--g2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+}
+
+.brand-text{
+  display:flex;
+  flex-direction:column;
+  line-height:1.2;
+}
+.brand-text .top{font-size:15px;font-weight:600;}
+.brand-text .sub{font-size:12px;opacity:.9;}
+
+.nav-right{
+  display:flex;
+  gap:10px;
+}
+.icon-btn{
+  height:34px;
+  padding:0 14px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--g1),var(--g2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+
+/* ===== PAGE WRAP ===== */
+.wrap{
+  padding-top:80px;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== GLASS CARD ===== */
+.card{
+  width:100%;
+  max-width:420px;
+  padding:28px;
+  border-radius:18px;
+  background:rgba(255,255,255,.14);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 30px 70px rgba(0,0,0,.45);
+  animation: zoomIn .45s ease;
+  text-align:center;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes zoomIn{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+/* ===== SILVER RUN TEXT ===== */
+.silver-run{
+  background:linear-gradient(
+    120deg,
+    rgba(255,255,255,.7),
+    rgba(255,255,255,1),
+    rgba(200,200,200,.85),
+    rgba(255,255,255,1),
+    rgba(255,255,255,.7)
+  );
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:silverRun 2.6s linear infinite;
+}
+
+@keyframes silverRun{
+  from{background-position:0%}
+  to{background-position:220%}
+}
+
+/* ===== WAVE EXCLAMATION ===== */
+.wave-bang{
+  display:inline-block;
+  transform-origin:40% 70%;
+  animation:waveBang 1.6s ease-in-out infinite;
+}
+
+@keyframes waveBang{
+  0%{transform:rotate(0)}
+  20%{transform:rotate(-12deg)}
+  40%{transform:rotate(14deg)}
+  60%{transform:rotate(-8deg)}
+  80%{transform:rotate(10deg)}
+  100%{transform:rotate(0)}
+}
+
+@media(max-width:480px){
+  .wrap{padding-top:72px;}
+}
+
+/* ===== GRID SYSTEM ===== */
+.grid{
+  display:grid;
+  gap: 12px;
+  grid-template-columns: repeat(12, 1fr);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 14px;
+}
+.col-12{ grid-column: span 12; }
+.col-6{ grid-column: span 6; }
+.col-4{ grid-column: span 4; }
+@media (max-width: 780px){
+  .col-6,.col-4{ grid-column: span 12; }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.row{ 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  gap:10px; 
+  flex-wrap:wrap; 
+}
+h1,h2,h3{ margin:0 0 10px; }
+.muted{ 
+  color: rgba(255,255,255,.7); 
+  font-size: 14px;
+}
+
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration:none;
+  transition: transform .08s ease, opacity .2s ease;
+  user-select:none;
+  white-space:nowrap;
+  font-size: 14px;
+}
+.btn:active{ transform: scale(.98); }
+.btn-primary{ 
+  background: linear-gradient(90deg, var(--g1), var(--g2)); 
+  color:#fff; 
+}
+.btn-ghost{ 
+  background: transparent; 
+  border: 1px solid rgba(255,255,255,.35); 
+  color: #fff; 
+}
+
+/* ===== FORM STYLES ===== */
+.field{ margin-bottom:12px; }
+label{ 
+  display:block; 
+  font-weight:600; 
+  margin-bottom:6px; 
+  color: rgba(255,255,255,.9);
+}
+input, select, textarea{
+  width:100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.1);
+  color: #fff;
+  outline:none;
+  font-size: 14px;
+}
+input::placeholder, textarea::placeholder{
+  color: rgba(255,255,255,.5);
+}
+input:focus, select:focus, textarea:focus{
+  border-color: var(--g2);
+  background: rgba(255,255,255,.15);
+}
+
+/* ===== BADGES ===== */
+.badge{
+  display:inline-block;
+  padding: 6px 12px;
+  border-radius:999px;
+  font-size: 12px;
+  font-weight: 700;
+  border:1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.1);
+  color: #fff;
+}
+.b-pending{ 
+  background: rgba(245,158,11,.2); 
+  border-color: rgba(245,158,11,.4); 
+}
+.b-approved{ 
+  background: rgba(34,197,94,.2); 
+  border-color: rgba(34,197,94,.4); 
+}
+.b-otp{ 
+  background: rgba(59,130,246,.2); 
+  border-color: rgba(59,130,246,.4); 
+}
+.b-paid{ 
+  background: rgba(34,197,94,.25); 
+  border-color: rgba(34,197,94,.45); 
+}
+.b-rejected{ 
+  background: rgba(239,68,68,.2); 
+  border-color: rgba(239,68,68,.4); 
+}
+
+/* ===== CARD OVERRIDES FOR GRID ===== */
+.grid .card{
+  max-width: 100%;
+  text-align: left;
+}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+  <a href="/choose/" class="brand">
+    <div class="logo">GB</div>
+    <div class="brand-text">
+      <div class="top">GreenBank.com</div>
+      <div class="sub">Trusted • 24/7</div>
+    </div>
+  </a>
+
+  <div class="nav-right">
+    <div class="icon-btn">i</div>
+  </div>
+</div>
+
+<div class="wrap">
+  {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

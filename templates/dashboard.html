@@ -1,0 +1,627 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  /* ===== IMPORTANT: hide base navbar/header (remove GreenBank on left) ===== */
+  .nav,
+  .navbar,
+  .top-nav,
+  .topnav,
+  .site-nav,
+  .site-header,
+  .header,
+  header,
+  .app-header,
+  .main-header{
+    display:none !important;
+  }
+
+  /* if base.html uses wrapper flex causing “twist” */
+  .wrap{
+    padding-top:0 !important;
+    display:block !important;
+    width:100% !important;
+  }
+
+  html, body{
+    width:100%;
+    overflow-x:hidden; /* stop sideways jump/twist */
+  }
+
+  /* ===== Dashboard page layout (center on PC/phone) ===== */
+  .dash-wrap{
+    width: min(520px, 94vw);
+    margin: 0 auto;
+    padding: 14px 14px 92px;
+    box-sizing: border-box;
+  }
+
+  /* ===== Background fixed ===== */
+  body{
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      linear-gradient(rgba(0,0,0,.58), rgba(0,0,0,.78)),
+      url("{% static 'img/SL-012322-48100-03.jpg' %}") center / cover no-repeat fixed !important;
+  }
+
+  /* ===== Top bar (mini only) ===== */
+  .topbar{
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: linear-gradient(90deg, #10c15a, #1bb85d);
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,.18);
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  }
+  .topbar-inner{
+    max-width: 600px;
+    margin: 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .brand-mini{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    text-decoration:none;
+    font-weight:900;
+  }
+  .brand-mini .logo{
+    width:34px;height:34px;
+    border-radius:10px;
+    background: rgba(0,0,0,.18);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+  }
+  .info-btn{
+    width:34px;height:34px;border-radius:12px;
+    border:0;
+    background: rgba(0,0,0,.18);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+
+  /* ===== Cards ===== */
+  .cardx{
+    background: rgba(20, 28, 28, .58);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+    border-radius: 18px;
+    padding: 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* ===== Swipe in animation (left/right) ===== */
+  .reveal{
+    opacity:0;
+    transform: translateX(0);
+    will-change: transform, opacity;
+  }
+  .from-left{ transform: translateX(-18px); }
+  .from-right{ transform: translateX(18px); }
+  .reveal.on{
+    opacity:1;
+    transform: translateX(0);
+    transition: opacity .45s ease, transform .45s ease;
+  }
+
+  /* ===== Profile card ===== */
+  .profile-card{ display:flex; gap:12px; align-items:flex-start; }
+  .avatar{
+    width:44px;height:44px;border-radius:14px;
+    background: rgba(255,255,255,.10);
+    display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;
+    border:1px solid rgba(255,255,255,.10);
+  }
+  .avatar svg{ width:22px; height:22px; opacity:.9; }
+  .profile-main{ flex:1 1 auto; min-width:0; }
+  .row1{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .title{ color:#fff; font-weight:900; font-size:18px; line-height:1.1; }
+  .subline{ color:rgba(255,255,255,.72); font-size:12px; margin-top:2px; }
+  .pill{
+    padding:6px 12px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    color:#dfffe9;
+    font-weight:800;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .amount{
+    font-size:34px;font-weight:950;letter-spacing:.02em;
+    color:#fff;margin-top:10px;
+  }
+  .status{ margin-top:6px;font-size:12px;font-weight:900;color:#d5ffe7; }
+
+  /* ===== Section title ===== */
+  .section-title{
+    margin: 14px 2px 10px;
+    color:#e9fff1;
+    font-weight:950;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    opacity:.9;
+  }
+
+  /* ===== Why choose ===== */
+  .why-card{ padding: 14px; }
+  .why-head{
+    display:flex;justify-content:center;align-items:center;gap:6px;
+    font-weight:950;font-size:18px;color:#fff;margin-bottom:10px;
+  }
+  .why-head .green{ color:#25d66c; }
+  .ad-frame{
+    border-radius: 16px; overflow:hidden;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.28);
+    position:relative;
+    height: 132px;
+  }
+  .ad-slide{
+    position:absolute; inset:0;
+    opacity:0;
+    transform: translateX(16px);
+    transition: opacity .45s ease, transform .45s ease;
+    display:flex;
+    align-items:stretch;
+    justify-content:stretch;
+  }
+  .ad-slide.on{ opacity:1; transform: translateX(0); }
+  .ad-slide img{
+    width:100%; height:100%;
+    object-fit:cover;
+    filter: contrast(1.06) saturate(1.05);
+  }
+  .ad-overlay{
+    position:absolute; inset:0;
+    background: linear-gradient(90deg, rgba(0,0,0,.60), rgba(0,0,0,.12));
+    pointer-events:none;
+  }
+  .ad-text{
+    position:absolute; left:14px; top:14px; right: 92px;
+    color:#fff; z-index:2;
+  }
+  .ad-text h4{ margin:0; font-size:16px; font-weight:950; letter-spacing:.01em; }
+  .ad-text p{ margin:4px 0 0; font-size:12px; opacity:.86; }
+  .ad-btn{
+    position:absolute; left:14px; bottom:12px; z-index:2;
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 12px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.16);
+    background: rgba(0,0,0,.28);
+    color:#fff; font-weight:900; font-size:12px;
+    text-decoration:none;
+  }
+  .dots{ display:flex; gap:6px; justify-content:center; margin-top:10px; opacity:.9; }
+  .dot{ width:7px;height:7px;border-radius:99px;background: rgba(255,255,255,.25); }
+  .dot.on{ background: #24d96d; }
+
+  /* ===== Quick loan ===== */
+  .quick{
+    margin-top: 14px;
+    width: 100%;
+    border:0;
+    padding: 14px 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0da84c, #27dd75);
+    color:#fff;
+    font-weight:950;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    cursor:pointer;
+    position: relative;
+    overflow:hidden;
+  }
+  .quick .go{
+    width:30px;height:30px;border-radius:999px;
+    background: rgba(0,0,0,.20);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,.20);
+  }
+  .quick .go svg{ width:16px;height:16px; fill:#fff; opacity:.95; }
+
+  /* ===== Video section (ensure visible) ===== */
+  .video-card{
+    border-radius: 16px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.28);
+    height: 160px;
+    position:relative;
+  }
+  .video-card video{
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    display:block;
+  }
+
+  /* ===== Currency table card ===== */
+  .table-card{ padding: 12px; }
+
+  /* ===== Bottom nav ===== */
+  .bottom-nav{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    background: linear-gradient(90deg, #0da84c, #27dd75);
+    border-top: 1px solid rgba(0,0,0,.22);
+    padding: 10px 16px;
+    box-shadow: 0 -10px 30px rgba(0,0,0,.35);
+  }
+  .nav-inner{
+    max-width: 600px;
+    margin: 0 auto;
+    display:flex;
+    justify-content:space-around;
+    gap: 6px;
+  }
+  .nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    color:#fff;
+    text-decoration:none;
+    font-weight:900;
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    opacity:.92;
+  }
+  .nav-item.active{ opacity:1; }
+  .nav-item svg{ width:20px;height:20px; fill:#fff; opacity:.95; }
+
+  /* ===== Exchange rate ===== */
+  .fx-scroll{
+    max-height: 260px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+  }
+  .fx-scroll::-webkit-scrollbar{ width: 6px; }
+  .fx-scroll::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.18); border-radius: 99px; }
+  .fx-table{ width:100%; border-collapse: collapse; }
+  .fx-table thead th{
+    position: sticky;
+    top: 0;
+    background: rgba(0,0,0,.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2;
+  }
+  .fx-table th, .fx-table td{ padding: 10px 10px; }
+  .fx-table th{
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: .85;
+  }
+  .fx-table td{ border-top: 1px solid rgba(255,255,255,.08); color:#f2fff7; }
+  .fx-left{ display:flex; align-items:center; gap:10px; min-width: 0; }
+  .fx-flag{
+    width: 22px; height: 16px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.15);
+    flex: 0 0 auto;
+  }
+  .fx-code{ font-weight: 950; letter-spacing: .04em; }
+  .fx-country{
+    font-size: 11px;
+    opacity: .7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fx-meta{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-top: 8px;
+    font-size: 11px;
+    opacity: .85;
+    color:#eafff1;
+  }
+  .fx-auto{ opacity: .75; }
+</style>
+
+<div id="top"></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand-mini" href="#top" aria-label="Top">
+      <div class="logo">GB</div>
+    </a>
+    <button class="info-btn" type="button" aria-label="Info">i</button>
+  </div>
+</div>
+
+<div class="dash-wrap">
+
+  <!-- Notification -->
+  <div style="display:flex; justify-content:flex-end; margin-top:10px;" class="reveal from-right">
+    <button class="info-btn" type="button" aria-label="Notifications" style="border-radius:14px;">
+      🔔
+    </button>
+  </div>
+
+  <!-- Profile card -->
+  <div class="cardx profile-card metal reveal from-left">
+    <div class="avatar" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.42 0-8 2-8 4.5V21h16v-2.5C20 16 16.42 14 12 14z"/></svg>
+    </div>
+
+    <div class="profile-main">
+      <div class="row1">
+        <div>
+          <div class="title">Welcome</div>
+          <div class="subline">Account: {{ request.user.username }}</div>
+        </div>
+        <div class="pill">Balance</div>
+      </div>
+
+      <div class="amount">Rs {{ request.user.balance|default:"0.00" }}</div>
+      <div class="status">Status: {{ request.user.status|default:"ACTIVE" }}</div>
+    </div>
+  </div>
+
+  <!-- Why choose -->
+  <div class="cardx why-card metal reveal from-right" style="margin-top:14px;">
+    <div class="why-head">
+      Why Choose <span class="green">GreenBank</span>?
+    </div>
+
+    <div class="ad-frame" aria-label="Why choose slider">
+      <div class="ad-slide on" data-i="0">
+        <img src="{% static 'img/ads/ad1.jpg' %}" alt="Ad 1">
+        <div class="ad-overlay"></div>
+        <div class="ad-text">
+          <h4>Fast approval</h4>
+          <p>Clear process • quick verification • secure system</p>
+        </div>
+        <a class="ad-btn" href="#">Learn more <span style="opacity:.85;">›</span></a>
+      </div>
+
+      <div class="ad-slide" data-i="1">
+        <img src="{% static 'img/ads/ad2.jpg' %}" alt="Ad 2">
+        <div class="ad-overlay"></div>
+        <div class="ad-text">
+          <h4>Trusted service</h4>
+          <p>No hidden fees • transparent policy • 24/7 support</p>
+        </div>
+        <a class="ad-btn" href="#">Details <span style="opacity:.85;">›</span></a>
+      </div>
+
+      <div class="ad-slide" data-i="2">
+        <img src="{% static 'img/ads/ad3.jpg' %}" alt="Ad 3">
+        <div class="ad-overlay"></div>
+        <div class="ad-text">
+          <h4>Easy to use</h4>
+          <p>Mobile-friendly dashboard • simple steps • strong security</p>
+        </div>
+        <a class="ad-btn" href="#">Start now <span style="opacity:.85;">›</span></a>
+      </div>
+    </div>
+
+    <div class="dots" aria-hidden="true" id="adsDots">
+      <div class="dot on"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- Quick loan -->
+  <button class="quick reveal from-left" type="button" id="quick">
+    Quick Loan →
+    <span class="go" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </span>
+  </button>
+
+  <!-- Client last status (video) -->
+  <div class="section-title reveal from-right" id="status">CLIENT LASTED STATUS</div>
+  <div class="cardx video-card metal reveal from-right">
+    <video id="statusVideo" autoplay muted loop playsinline preload="auto">
+      <source src="{% static 'video/video.mp4' %}" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Currency -->
+  <div class="section-title reveal from-left" id="currency">CURRENCY</div>
+
+  <div class="cardx table-card reveal from-left">
+    <div class="fx-scroll" aria-label="Exchange rates list">
+      <table class="fx-table">
+        <thead>
+          <tr>
+            <th>CURRENCY</th>
+            <th>CONVERT</th>
+            <th>USD</th>
+          </tr>
+        </thead>
+        <tbody id="fxRows"></tbody>
+      </table>
+    </div>
+
+    <div class="fx-meta">
+      <div id="fxUpdated">Updated: —</div>
+      <div class="fx-auto">Auto daily</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav" role="navigation" aria-label="Bottom Navigation">
+  <div class="nav-inner">
+    <a class="nav-item" href="#top" data-nav="home" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      HOME
+    </a>
+    <a class="nav-item" href="#quick" data-nav="wallet" aria-label="Wallet">
+      <svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2h-6a2 2 0 0 0 0 4h6v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M20 11h-5a1 1 0 0 0 0 2h5z" opacity=".75"/></svg>
+      WALLET
+    </a>
+    <a class="nav-item" href="#currency" data-nav="contact" aria-label="Contact">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3z"/><path d="M7 8h10M7 11h7" stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linecap="round"/></svg>
+      CONTACT
+    </a>
+    <a class="nav-item" href="/profile/" data-nav="profile" aria-label="Profile">
+      <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.42 0-8 2-8 4.5V21h16v-2.5C20 16 16.42 14 12 14z"/></svg>
+      PROFILE
+    </a>
+  </div>
+</nav>
+
+<script>
+/* ===== Reveal animation on load (swipe left/right) ===== */
+(function(){
+  const nodes = Array.from(document.querySelectorAll('.reveal'));
+  if(!nodes.length) return;
+  requestAnimationFrame(() => nodes.forEach((el, i) => setTimeout(() => el.classList.add('on'), 60 + i*70)));
+})();
+</script>
+
+<script>
+/* ===== Make video show/play from first load ===== */
+(function(){
+  const v = document.getElementById('statusVideo');
+  if(!v) return;
+
+  const tryPlay = () => {
+    const p = v.play();
+    if(p && typeof p.catch === "function") p.catch(()=>{});
+  };
+
+  if(document.readyState === "complete" || document.readyState === "interactive"){
+    setTimeout(tryPlay, 50);
+  }else{
+    document.addEventListener("DOMContentLoaded", () => setTimeout(tryPlay, 50));
+  }
+  document.addEventListener("visibilitychange", () => {
+    if(!document.hidden) setTimeout(tryPlay, 50);
+  });
+})();
+</script>
+
+<script>
+/* ===== Ad slider ===== */
+(function(){
+  const slides = Array.from(document.querySelectorAll('.ad-slide'));
+  const dots = Array.from(document.querySelectorAll('#adsDots .dot'));
+  if(!slides.length) return;
+
+  let i = 0;
+  setInterval(() => {
+    slides[i].classList.remove('on');
+    dots[i].classList.remove('on');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('on');
+    dots[i].classList.add('on');
+  }, 3500);
+})();
+</script>
+
+<script>
+/* ===== Bottom nav active highlight ===== */
+(function(){
+  const items = Array.from(document.querySelectorAll(".bottom-nav .nav-item"));
+  if(!items.length) return;
+
+  function setActiveFromHash(){
+    const h = (location.hash || "#top").toLowerCase();
+    items.forEach(a => a.classList.remove("active"));
+    const hit = items.find(a => (a.getAttribute("href") || "").toLowerCase() === h);
+    (hit || items[0]).classList.add("active");
+  }
+  window.addEventListener("hashchange", setActiveFromHash);
+  setActiveFromHash();
+})();
+</script>
+
+<script>
+/* ===== Currency exchange (auto) ===== */
+(function(){
+  const rowsEl = document.getElementById('fxRows');
+  const updatedEl = document.getElementById('fxUpdated');
+  if(!rowsEl) return;
+
+  const currencies = [
+    { code:'AFN', country:'Afghanistan', flag:"{% static 'img/flags/Afghanistan.png' %}" },
+    { code:'INR', country:'India',       flag:"{% static 'img/flags/india.png' %}" },
+    { code:'IDR', country:'Indonesia',   flag:"{% static 'img/flags/Indonesia.png' %}" },
+    { code:'KES', country:'Kenya',       flag:"{% static 'img/flags/Kenyan.png' %}" },
+    { code:'MYR', country:'Malaysia',    flag:"{% static 'img/flags/Malaysia.png' %}" },
+    { code:'OMR', country:'Oman',        flag:"{% static 'img/flags/Oman.png' %}" },
+    { code:'PKR', country:'Pakistan',    flag:"{% static 'img/flags/pakistan.png' %}" },
+    { code:'PHP', country:'Philippines', flag:"{% static 'img/flags/Philippines.png' %}" },
+    { code:'SAR', country:'Saudi',       flag:"{% static 'img/flags/saudi arabian.png' %}" },
+    { code:'VND', country:'Vietnam',     flag:"{% static 'img/flags/vietnam.png' %}" },
+  ];
+
+  function fmtRate(x){
+    if(!isFinite(x)) return '—';
+    if(x >= 1000) return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(x);
+    if(x >= 100)  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(x);
+    if(x >= 1)    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }).format(x);
+    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 4 }).format(x);
+  }
+
+  function render(rates, dateStr){
+    rowsEl.innerHTML = '';
+    currencies.forEach(c => {
+      const rate = rates && rates[c.code];
+      const tr = document.createElement('tr');
+
+      const td1 = document.createElement('td');
+      td1.innerHTML = `
+        <div class="fx-left">
+          <img class="fx-flag" src="${c.flag}" alt="${c.country}">
+          <div style="min-width:0">
+            <div class="fx-code">${c.code}</div>
+            <div class="fx-country">${c.country}</div>
+          </div>
+        </div>
+      `;
+
+      const td2 = document.createElement('td');
+      td2.textContent = '1 USD';
+
+      const td3 = document.createElement('td');
+      td3.style.textAlign = 'right';
+      td3.textContent = (rate ? `${fmtRate(rate)} ${c.code}` : `— ${c.code}`);
+
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      rowsEl.appendChild(tr);
+    });
+
+    const now = new Date();
+    updatedEl.textContent = 'Updated: ' + (dateStr || now.toLocaleString());
+  }
+
+  fetch('https://api.frankfurter.app/latest?from=USD')
+    .then(r => r.ok ? r.json() : Promise.reject(r))
+    .then(data => render(data.rates || {}, data.date))
+    .catch(() => render(null, null));
+})();
+</script>
+
+{% endblock %}

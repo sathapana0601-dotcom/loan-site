@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="grid">
+  <div class="card col-12">
+    <div class="row">
+      <div>
+        <h2>Create Account</h2>
+        <div class="muted">Open your account in minutes</div>
+      </div>
+      <a class="btn btn-ghost" href="/login/">Back to login</a>
+    </div>
+  </div>
+
+  <div class="card col-12">
+    <form method="post">
+      {% csrf_token %}
+      <!-- If you use Django form: -->
+      {{ form.as_p }}
+      <button class="btn btn-primary" type="submit" style="width:100%;">REGISTER</button>
+    </form>
+
+    <div class="muted" style="margin-top:10px;">
+      By registering, you agree to our service rules.
+    </div>
+  </div>
+</div>
+{% endblock %}

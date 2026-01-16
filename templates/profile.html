@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<style>
+  /* ===== same background as dashboard ===== */
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      linear-gradient(rgba(0,0,0,.58), rgba(0,0,0,.78)),
+      url("{% static 'img/SL-012322-48100-03.jpg' %}") center / cover no-repeat fixed !important;
+    color:#fff;
+  }
+
+  /* base.html wrap is centered -> override for profile */
+  .wrap{
+    align-items:flex-start !important;
+    justify-content:center !important;
+    padding-top:80px !important;
+  }
+
+  .p-wrap{
+    width: min(520px, 94vw);
+    margin: 0 auto;
+    padding: 14px 14px 92px;
+    box-sizing:border-box;
+  }
+
+  /* ===== cards ===== */
+  .cardx{
+    background: rgba(20, 28, 28, .58);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+    border-radius: 18px;
+    padding: 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .h-title{
+    font-weight:950;
+    font-size:18px;
+    letter-spacing:.02em;
+  }
+  .h-sub{
+    font-size:12px;
+    opacity:.75;
+    margin-top:2px;
+  }
+
+  .mini{
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    color:#dfffe9;
+    font-weight:850;
+    font-size:12px;
+    white-space:nowrap;
+  }
+
+  /* ===== menu buttons ===== */
+  .menu{
+    display:grid;
+    gap:12px;
+  }
+
+  .p-btn{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 14px;
+    border-radius:16px;
+    text-decoration:none;
+    color:#fff;
+    background: rgba(0,0,0,.20);
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 10px 26px rgba(0,0,0,.28);
+    transition: transform .12s ease, opacity .12s ease;
+    opacity:0;
+    transform: translateY(-14px);
+  }
+  .p-btn:active{ transform: translateY(-10px) scale(.99); }
+
+  .left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
+  .ico{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    background: rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.10);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex: 0 0 auto;
+  }
+  .ico svg{ width:20px; height:20px; fill:#fff; opacity:.95; }
+
+  .txt{ min-width:0; }
+  .t1{
+    font-weight:950;
+    font-size:14px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .t2{
+    font-size:12px;
+    opacity:.75;
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .chev{
+    width:30px;
+    height:30px;
+    border-radius:999px;
+    background: rgba(0,0,0,.20);
+    border:1px solid rgba(255,255,255,.14);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+  }
+  .chev svg{ width:16px; height:16px; fill:#fff; opacity:.95; }
+
+  /* ===== show animation ===== */
+  .p-btn.show{
+    opacity:1;
+    transform: translateY(0);
+  }
+
+  /* ===== bottom nav (same color family) ===== */
+  .bottom-nav{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    background: linear-gradient(90deg, #0da84c, #27dd75);
+    border-top: 1px solid rgba(0,0,0,.22);
+    padding: 10px 16px;
+    box-shadow: 0 -10px 30px rgba(0,0,0,.35);
+  }
+  .nav-inner{
+    max-width: 600px;
+    margin: 0 auto;
+    display:flex;
+    justify-content:space-around;
+    gap: 6px;
+  }
+  .nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    color:#fff;
+    text-decoration:none;
+    font-weight:900;
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    opacity:.92;
+  }
+  .nav-item svg{ width:20px;height:20px; fill:#fff; opacity:.95; }
+
+  /* ===== small helper ===== */
+  .sp{ height: 10px; }
+</style>
+
+<div class="p-wrap">
+
+  <div class="cardx">
+    <div class="head">
+      <div>
+        <div class="h-title">Profile</div>
+        <div class="h-sub">Account: {{ request.user.phone }}</div>
+      </div>
+      <div class="mini">{{ request.user.status|default:"ACTIVE" }}</div>
+    </div>
+
+    <div style="font-size:12px; opacity:.85;">
+      Balance: <span style="font-weight:950;">Rs {{ request.user.balance|default:"0.00" }}</span>
+    </div>
+  </div>
+
+  <div class="sp"></div>
+
+  <div class="menu" id="menu">
+    <a class="p-btn" href="#" aria-label="Credit Score">
+      <div class="left">
+        <div class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 19h16v2H4zM6 17V7h3v10H6zm5 0V4h3v13h-3zm5 0v-9h3v9h-3z"/></svg>
+        </div>
+        <div class="txt">
+          <div class="t1">Credit Score</div>
+          <div class="t2">View your score & level</div>
+        </div>
+      </div>
+      <div class="chev" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </a>
+
+    <a class="p-btn" href="#" aria-label="Loan Application">
+      <div class="left">
+        <div class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M6 2h9l3 3v17H6V2zm9 1.5V6h2.5L15 3.5zM8 9h8v2H8V9zm0 4h8v2H8v-2zm0 4h6v2H8v-2z"/></svg>
+        </div>
+        <div class="txt">
+          <div class="t1">Loan Application</div>
+          <div class="t2">Apply & track your status</div>
+        </div>
+      </div>
+      <div class="chev" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </a>
+
+    <a class="p-btn" href="#" aria-label="Transactions">
+      <div class="left">
+        <div class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 7h14v4H7V7zM3 6h3v6H3V6zm4 9h14v4H7v-4zM3 14h3v6H3v-6z"/></svg>
+        </div>
+        <div class="txt">
+          <div class="t1">Transactions</div>
+          <div class="t2">History of deposits & withdrawals</div>
+        </div>
+      </div>
+      <div class="chev" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </a>
+
+    <a class="p-btn" href="#" aria-label="Payment Schedule">
+      <div class="left">
+        <div class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm14 8H3V8h18v2z"/></svg>
+        </div>
+        <div class="txt">
+          <div class="t1">Payment Schedule</div>
+          <div class="t2">Installments & due dates</div>
+        </div>
+      </div>
+      <div class="chev" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </a>
+
+    <a class="p-btn" href="/logout/" aria-label="Logout">
+      <div class="left">
+        <div class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M10 17l1.4-1.4-2.6-2.6H20v-2H8.8l2.6-2.6L10 7l-7 7 7 7zM4 4h7V2H4a2 2 0 0 0-2 2v6h2V4zm0 18h7v-2H4v-6H2v6a2 2 0 0 0 2 2z"/></svg>
+        </div>
+        <div class="txt">
+          <div class="t1">Logout</div>
+          <div class="t2">Securely exit your account</div>
+        </div>
+      </div>
+      <div class="chev" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </a>
+  </div>
+
+</div>
+
+<!-- Bottom nav -->
+<div class="bottom-nav">
+  <div class="nav-inner">
+    <a class="nav-item" href="/dashboard/">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3z"/></svg>
+      HOME
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16v10H4zM6 9h8v2H6z"/></svg>
+      WALLET
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24"><path d="M21 6H3v12h18zM5 8h14v8H5z"/></svg>
+      CONTACT
+    </a>
+    <a class="nav-item" href="/profile/">
+      <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.42 0-8 2-8 4.5V21h16v-2.5C20 16 16.42 14 12 14z"/></svg>
+      PROFILE
+    </a>
+  </div>
+</div>
+
+<script>
+/* ===== animation: cards appear top->down (stagger) ===== */
+(function(){
+  const items = Array.from(document.querySelectorAll('.p-btn'));
+  items.forEach((el, idx) => {
+    setTimeout(() => el.classList.add('show'), 120 + idx * 120);
+  });
+})();
+</script>
+
+{% endblock %}

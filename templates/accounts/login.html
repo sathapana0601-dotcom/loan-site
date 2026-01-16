@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="grid">
+  <div class="card col-12">
+    <div class="row">
+      <div>
+        <h2>Login</h2>
+        <div class="muted">Sign in with phone & password</div>
+      </div>
+      <a class="btn btn-ghost" href="/register/">Create account</a>
+    </div>
+  </div>
+
+  <div class="card col-12">
+    <form method="post">
+      {% csrf_token %}
+      <div class="field">
+        <label>Phone number</label>
+        <input name="phone" placeholder="e.g. 03xxxxxxxxx" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input name="password" type="password" placeholder="••••••••" required>
+      </div>
+
+      {% if error %}
+        <div class="card" style="border-color:#fecaca; background:rgba(239,68,68,.08);">
+          <b>Login failed:</b> {{ error }}
+        </div>
+      {% endif %}
+
+      <button class="btn btn-primary" type="submit" style="width:100%;">START →</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
