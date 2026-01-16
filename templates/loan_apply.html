@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Loan Application{% endblock %}
+
+{% block content %}
+<style>
+  .page-wrap{
+    width:min(520px, 94vw);
+    margin:0 auto;
+    padding: 10px 14px 40px;
+    box-sizing:border-box;
+  }
+
+  .glass{
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 18px;
+    padding: 16px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  }
+
+  .title{
+    font-weight: 900;
+    font-size: 18px;
+    margin: 0 0 10px;
+  }
+  .sub{
+    opacity:.75;
+    font-size: 12px;
+    margin: 0 0 12px;
+  }
+
+  .section-label{
+    margin: 14px 0 10px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity:.9;
+  }
+
+  .grid2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width:520px){
+    .grid2{ grid-template-columns: 1fr; }
+  }
+
+  .field label{
+    display:block;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom:6px;
+    opacity:.9;
+  }
+  .field input, .field select{
+    width:100%;
+    padding: 12px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.20);
+    background: rgba(0,0,0,.22);
+    color:#fff;
+    outline:none;
+  }
+
+  .error{
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(239,68,68,.20);
+    border: 1px solid rgba(239,68,68,.35);
+    font-weight: 800;
+    font-size: 12px;
+  }
+
+  .summary{
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(0,0,0,.22);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .sum-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding: 6px 0;
+    border-top: 1px solid rgba(255,255,255,.08);
+    font-size: 13px;
+  }
+  .sum-row:first-child{ border-top:0; }
+  .sum-row b{ font-weight: 950; }
+
+  .apply-btn{
+    margin-top: 14px;
+    width:100%;
+    border:0;
+    padding: 14px 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0da84c, #27dd75);
+    color:#fff;
+    font-weight: 950;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    cursor:pointer;
+  }
+
+  /* page enter animation */
+  .enter{
+    animation: slideIn .45s ease both;
+  }
+  @keyframes slideIn{
+    from{ transform: translateY(12px); opacity: 0; }
+    to{ transform: translateY(0); opacity: 1; }
+  }
+</style>
+
+<div class="page-wrap enter">
+
+  <div class="glass">
+    <div class="title">Loan Application</div>
+    <div class="sub">Complete all required to apply for laon</div>
+
+    {% if form_error %}
+      <div class="error">{{ form_error }}</div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="section-label">1) Information Required</div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Full name</label>
+          <input name="full_name" placeholder="Your full name" required>
+        </div>
+        <div class="field">
+          <label>Age</label>
+          <input name="age" type="number" min="18" placeholder="18+" required>
+        </div>
+
+        <div class="field">
+          <label>Current living</label>
+          <input name="current_living" placeholder="Current address" required>
+        </div>
+        <div class="field">
+          <label>Hometown</label>
+          <input name="hometown" placeholder="Hometown" required>
+        </div>
+
+        <div class="field">
+          <label>Income (optional)</label>
+          <input name="income" placeholder="Income">
+        </div>
+        <div class="field">
+          <label>Monthly expenses (optional)</label>
+          <input name="monthly_expenses" placeholder="Expenses">
+        </div>
+
+        <div class="field">
+          <label>Guarantor contact</label>
+          <input name="guarantor_contact" placeholder="Phone / Contact" required>
+        </div>
+        <div class="field">
+          <label>Guarantor current living</label>
+          <input name="guarantor_current_living" placeholder="Address" required>
+        </div>
+
+        <div class="field">
+          <label>Identity number</label>
+          <input name="identity_number" placeholder="ID number" required>
+        </div>
+
+        <div class="field">
+          <label>Income proof (optional)</label>
+          <input name="income_proof" type="file">
+        </div>
+
+        <div class="field">
+          <label>ID Front (photo)</label>
+          <input name="id_front" type="file" accept="image/*">
+        </div>
+        <div class="field">
+          <label>ID Back (photo)</label>
+          <input name="id_back" type="file" accept="image/*">
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Selfie with ID (photo)</label>
+          <input name="selfie_with_id" type="file" accept="image/*">
+        </div>
+      </div>
+
+      <div class="section-label">2) Apply Loan</div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Loan amount (min {{ min_amount }} / max {{ max_amount }})</label>
+          <input id="loanAmount" name="amount" type="number" min="200000" step="0.01" placeholder="200000+" required>
+        </div>
+
+        <div class="field">
+          <label>Loan terms</label>
+          <select id="loanTerm" name="term_months" required>
+            {% for t in terms %}
+              <option value="{{t}}">{{t}} months</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="summary" aria-label="Summary">
+        <div class="sum-row"><span>Amount of loan</span><b id="sumAmount">—</b></div>
+        <div class="sum-row"><span>Interest rate (monthly)</span><b id="sumRate">—</b></div>
+        <div class="sum-row"><span>Loan period</span><b id="sumTerm">—</b></div>
+        <div class="sum-row"><span>Monthly repayment</span><b id="sumMonthly">—</b></div>
+      </div>
+
+      <button class="apply-btn" type="submit">Confirm Apply</button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const amountEl = document.getElementById("loanAmount");
+  const termEl = document.getElementById("loanTerm");
+
+  const sumAmount = document.getElementById("sumAmount");
+  const sumRate = document.getElementById("sumRate");
+  const sumTerm = document.getElementById("sumTerm");
+  const sumMonthly = document.getElementById("sumMonthly");
+
+  const rateMonthly = Number("{{ rate_monthly }}"); // e.g. 0.000300
+
+  function fmt(n){
+    if(!isFinite(n)) return "—";
+    return new Intl.NumberFormat(undefined, {maximumFractionDigits: 2}).format(n);
+  }
+
+  function recalc(){
+    const amount = Number(amountEl.value || 0);
+    const months = Number(termEl.value || 0);
+
+    sumAmount.textContent = amount ? ("Rs " + fmt(amount)) : "—";
+    sumRate.textContent = (rateMonthly*100).toFixed(3) + "%";
+    sumTerm.textContent = months ? (months + " months") : "—";
+
+    if(amount > 0 && months > 0){
+      // Simple interest monthly: total = P*(1+rate*months); monthly = total/months
+      const total = amount * (1 + rateMonthly * months);
+      const monthly = total / months;
+      sumMonthly.textContent = "Rs " + fmt(monthly);
+    }else{
+      sumMonthly.textContent = "—";
+    }
+  }
+
+  amountEl.addEventListener("input", recalc);
+  termEl.addEventListener("change", recalc);
+  recalc();
+})();
+</script>
+{% endblock %}

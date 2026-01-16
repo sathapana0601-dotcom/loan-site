@@ -17,7 +17,6 @@ def login_view(request):
         password = request.POST.get("password") or ""
 
         user = authenticate(request, username=phone, password=password)
-
         if user is not None:
             login(request, user)
             return redirect("dashboard")
@@ -56,6 +55,7 @@ def register_view(request):
             messages.error(request, "Passwords do not match.")
             return redirect("register")
 
+        # ✅ MUST accept agreement before creating account
         if not agreed:
             messages.error(request, "Please read and agree before click Register.")
             return redirect("register")
@@ -76,6 +76,27 @@ def dashboard_view(request):
 @login_required(login_url="/login/")
 def profile_view(request):
     return render(request, "profile.html")
+
+
+# ✅ friend extra pages (kept)
+@login_required(login_url="/login/")
+def credit_score_view(request):
+    return render(request, "credit_score.html")
+
+
+@login_required(login_url="/login/")
+def transactions_view(request):
+    return render(request, "transaction.html")  # friend said file name is singular
+
+
+@login_required(login_url="/login/")
+def payment_schedule_view(request):
+    return render(request, "payment_schedule.html")
+
+
+@login_required(login_url="/login/")
+def loan_apply_view(request):
+    return render(request, "loan_apply.html")
 
 
 def logout_view(request):
